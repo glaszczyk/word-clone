@@ -1,6 +1,6 @@
 import React from "react";
 
-export const GuessInput = ({ setGuessList }) => {
+export const GuessInput = ({ setGuessList, disabled }) => {
   const [guess, setGuess] = React.useState("");
 
   const handleSubmit = (event) => {
@@ -29,6 +29,7 @@ export const GuessInput = ({ setGuessList }) => {
         minLength={5}
         maxLength={5}
         onChange={handleChange}
+        disabled={disabled}
       />
     </form>
   );

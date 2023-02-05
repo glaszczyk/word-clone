@@ -31,7 +31,10 @@ function Game() {
   return (
     <>
       <GuessList guessList={guessesList} />
-      <GuessInput setGuessList={handleAddNextGuess} />
+      <GuessInput
+        setGuessList={handleAddNextGuess}
+        disabled={guessList.length === NUM_OF_GUESSES_ALLOWED}
+      />
     </>
   );
 }
