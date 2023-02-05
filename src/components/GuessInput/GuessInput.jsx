@@ -8,7 +8,6 @@ export const GuessInput = ({ setGuessList, disabled }) => {
     if (guess.length < 5) {
       return;
     }
-    console.log(">>>>>", guess);
     setGuessList(guess);
     setGuess("");
   };
