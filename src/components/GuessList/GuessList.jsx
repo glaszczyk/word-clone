@@ -6,7 +6,7 @@ export const GuessList = ({ guessList }) => {
   return (
     <div className="guess-results">
       {guessList.map((guess, i) => (
-        <Guess className="guess" key={`${i}-${guess}`} guess={guess} />
+        <Guess className="guess" key={`${i}`} guess={guess} />
       ))}
     </div>
   );
