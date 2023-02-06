@@ -212,6 +212,45 @@ h1 {
     color: #fff;
 }
 
+.keyboard-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.row-wrapper {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.keyboard-button {
+    align-items: center;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    min-width: 30px;
+    background-color: #ccc;
+    border-radius: 5px;
+}
+.keyboard-button.correct {
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: white;
+}
+.keyboard-button.incorrect {
+    background: var(--color-gray-300);
+    border-color: var(--color-gray-300);
+    color: white;
+}
+.keyboard-button.misplaced {
+    background: var(--color-warning);
+    border-color: var(--color-warning);
+    color: white;
+}
+.enter-button {
+    aspect-ratio: 3/1;
+    height: 30px;
+}
+
 /*
   Modal styles
 

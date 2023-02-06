@@ -2,12 +2,45 @@ import React from "react";
 
 import { range, sample } from "../../utils";
 import { WORDS } from "../../data";
+import { KEYS } from "../../keys";
 import { NUM_OF_GUESSES_ALLOWED } from "../../constants";
 import { checkGuess } from "../../game-helpers";
 
 import { GuessInput } from "../GuessInput";
 import { GuessList } from "../GuessList";
 import { Banner } from "../Banner";
+import { ScreenKeyboard } from "../ScreenKeyboard";
+
+const keysParsed = KEYS.map((key) => ({ letter: key.toUpperCase() }));
+
+const getKeyWithBestStatus = (arr, keyToFind) => {
+  const filteredKeys = arr.filter((item) => item.letter === keyToFind.letter);
+  if (filteredKeys.length === 0) {
+    return keyToFind;
+  }
+  return filteredKeys.reduce((acc, current) => {
+    if (Object.keys(acc).length === 0) {
+      return current;
+    }
+    if (acc?.status === "incorrect" && current?.status === "misplaced") {
+      return current;
+    }
+    if (acc?.status === "misplaced" && current?.status === "correct") {
+      return current;
+    }
+    return acc;
+  }, {});
+};
+
+const keysWithStatus = (keys, pressedKeys) => {
+  const flatterPressedKeys = pressedKeys.reduce(
+    (acc, current) => [...acc, ...current],
+    []
+  );
+  return keys.map((key) => ({
+    ...getKeyWithBestStatus(flatterPressedKeys, key),
+  }));
+};
 
 const getStatus = (isCorrectGuess, attemptsTaken) => {
   if (isCorrectGuess && attemptsTaken <= NUM_OF_GUESSES_ALLOWED) return "win";
@@ -18,6 +51,7 @@ const getStatus = (isCorrectGuess, attemptsTaken) => {
 
 function Game() {
   const defaultList = [];
+  const [guess, setGuess] = React.useState("");
   const [guessList, setGuessList] = React.useState(defaultList);
   const [isCorrectGuess, setIsCorrectGuess] = React.useState(false);
   const [attemptsTaken, setAttemptsTaken] = React.useState(0);
@@ -42,12 +76,40 @@ function Game() {
     setAttemptsTaken(0);
   };
 
+  const handleChangeGuess = (event) => {
+    const value = event.target.value.toUpperCase();
+    setGuess(value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (guess.length < 5) {
+      return;
+    }
+    handleAddNextGuess(guess);
+    setGuess("");
+  };
+
+  const handleScreenKeyboardSubmit = () => {
+    if (guess.length < 5) {
+      return;
+    }
+    handleAddNextGuess(guess);
+    setGuess("");
+  };
+
   const handleAddNextGuess = (nextWord) => {
     const checkedGuess = checkGuess(nextWord, answer);
     setAttemptsTaken(attemptsTaken + 1);
     setGuessList([...guessList, checkedGuess]);
     const result = checkedGuess.every((letter) => letter.status === "correct");
     setIsCorrectGuess(result);
+  };
+
+  const handleOnClick = (key) => {
+    if (guess.length < 5) {
+      setGuess(guess + key);
+    }
   };
 
   const renderResult = () => {
@@ -78,7 +140,9 @@ function Game() {
       <GuessList guessList={completeGuessList} />
       <div className="input-reset-wrapper">
         <GuessInput
-          setGuessList={handleAddNextGuess}
+          guess={guess}
+          onChange={handleChangeGuess}
+          handleSubmit={handleSubmit}
           disabled={
             getStatus(isCorrectGuess, attemptsTaken) === "win" ||
             getStatus(isCorrectGuess, attemptsTaken) === "lose"
@@ -89,6 +153,11 @@ function Game() {
         </button>
       </div>
       {renderResult()}
+      <ScreenKeyboard
+        onClick={handleOnClick}
+        onSubmit={handleScreenKeyboardSubmit}
+        keys={keysWithStatus(keysParsed, guessList)}
+      />
     </>
   );
 }
