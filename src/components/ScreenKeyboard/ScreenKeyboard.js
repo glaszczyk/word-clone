@@ -1,18 +1,23 @@
 import React from "react";
-import { KEYS } from "../../keys";
+import { range } from "../../utils";
 
-export const ScreenKeyboard = ({ onClick, onSubmit }) => {
+const rowsCount = [range(0, 10), range(10, 19), range(19, 26)];
+const row2obj = (arr, source) =>
+  arr.reduce((acc, current) => [...acc, source[current]], []);
+
+export const ScreenKeyboard = ({ onClick, onSubmit, keys }) => {
+  const keysInRows = rowsCount.map((row) => row2obj(row, keys));
   return (
     <div className="keyboard-wrapper">
-      {KEYS.map((row, i) => (
+      {keysInRows.map((row, i) => (
         <div key={i} className="row-wrapper">
-          {Object.keys(row).map((key) => (
+          {row.map((key) => (
             <button
-              key={key}
-              className="keyboard-button"
-              onClick={() => onClick(row[key])}
+              key={key.letter}
+              className={`keyboard-button ${key.status}`}
+              onClick={() => onClick(key.letter)}
             >
-              {row[key]}
+              {key.letter}
             </button>
           ))}
         </div>

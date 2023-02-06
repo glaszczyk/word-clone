@@ -2,6 +2,7 @@ import React from "react";
 
 import { range, sample } from "../../utils";
 import { WORDS } from "../../data";
+import { KEYS } from "../../keys";
 import { NUM_OF_GUESSES_ALLOWED } from "../../constants";
 import { checkGuess } from "../../game-helpers";
 
@@ -9,6 +10,38 @@ import { GuessInput } from "../GuessInput";
 import { GuessList } from "../GuessList";
 import { Banner } from "../Banner";
 import { ScreenKeyboard } from "../ScreenKeyboard";
+
+const keysParsed = KEYS.map((key) => ({ letter: key.toUpperCase() }));
+
+const keysWithStatus = (keys, pressedKeys) => {
+  const flatterPressedKeys = pressedKeys.reduce(
+    (acc, current) => [...acc, ...current],
+    []
+  );
+  console.log(flatterPressedKeys);
+  const findKey = (arr, key) => {
+    const filteredKeys = arr.filter((item) => item.letter === key.letter);
+    if (filteredKeys.length === 0) {
+      return key;
+    }
+    return filteredKeys.reduce((acc, current) => {
+      if (Object.keys(acc).length === 0) {
+        return current;
+      }
+      if (acc?.status === "incorrect" && current?.status === "misplaced") {
+        return current;
+      }
+      if (acc?.status === "misplaced" && current?.status === "correct") {
+        return current;
+      }
+      return acc;
+    }, {});
+  };
+
+  return keys.map((key) => ({
+    ...findKey(flatterPressedKeys, key),
+  }));
+};
 
 const getStatus = (isCorrectGuess, attemptsTaken) => {
   if (isCorrectGuess && attemptsTaken <= NUM_OF_GUESSES_ALLOWED) return "win";
@@ -124,6 +157,7 @@ function Game() {
       <ScreenKeyboard
         onClick={handleOnClick}
         onSubmit={handleScreenKeyboardSubmit}
+        keys={keysWithStatus(keysParsed, guessList)}
       />
     </>
   );
