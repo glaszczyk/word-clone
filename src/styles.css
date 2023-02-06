@@ -231,6 +231,21 @@ h1 {
     background-color: #ccc;
     border-radius: 5px;
 }
+.keyboard-button.correct {
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: white;
+}
+.keyboard-button.incorrect {
+    background: var(--color-gray-300);
+    border-color: var(--color-gray-300);
+    color: white;
+}
+.keyboard-button.misplaced {
+    background: var(--color-warning);
+    border-color: var(--color-warning);
+    color: white;
+}
 .enter-button {
     aspect-ratio: 3/1;
     height: 30px;
