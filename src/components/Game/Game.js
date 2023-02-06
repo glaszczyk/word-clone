@@ -9,11 +9,6 @@ import { GuessInput } from "../GuessInput";
 import { GuessList } from "../GuessList";
 import { Banner } from "../Banner";
 
-// Pick a random word on every pageload.
-const answer = sample(WORDS);
-// To make debugging easier, we'll log the solution in the console.
-console.info({ answer });
-
 const getStatus = (isCorrectGuess, attemptsTaken) => {
   if (isCorrectGuess && attemptsTaken <= NUM_OF_GUESSES_ALLOWED) return "win";
   if (!isCorrectGuess && attemptsTaken === NUM_OF_GUESSES_ALLOWED)
@@ -22,15 +17,30 @@ const getStatus = (isCorrectGuess, attemptsTaken) => {
 };
 
 function Game() {
-  const [guessList, setGuessList] = React.useState([]);
+  const defaultList = [];
+  const [guessList, setGuessList] = React.useState(defaultList);
   const [isCorrectGuess, setIsCorrectGuess] = React.useState(false);
   const [attemptsTaken, setAttemptsTaken] = React.useState(0);
+  const [answer, setAnswer] = React.useState(() => {
+    const result = sample(WORDS);
+    console.info({ result });
+    return result;
+  });
 
   const remainingEmptyRows =
     attemptsTaken === NUM_OF_GUESSES_ALLOWED
       ? []
       : range(0, NUM_OF_GUESSES_ALLOWED - attemptsTaken).map(() => null);
   const completeGuessList = [...guessList, ...remainingEmptyRows];
+
+  const restartGame = () => {
+    const newAnswer = sample(WORDS);
+    console.log({ newAnswer });
+    setAnswer(newAnswer);
+    setGuessList(defaultList);
+    setIsCorrectGuess(false);
+    setAttemptsTaken(0);
+  };
 
   const handleAddNextGuess = (nextWord) => {
     const checkedGuess = checkGuess(nextWord, answer);
@@ -66,13 +76,18 @@ function Game() {
   return (
     <>
       <GuessList guessList={completeGuessList} />
-      <GuessInput
-        setGuessList={handleAddNextGuess}
-        disabled={
-          getStatus(isCorrectGuess, attemptsTaken) === "win" ||
-          getStatus(isCorrectGuess, attemptsTaken) === "lose"
-        }
-      />
+      <div className="input-reset-wrapper">
+        <GuessInput
+          setGuessList={handleAddNextGuess}
+          disabled={
+            getStatus(isCorrectGuess, attemptsTaken) === "win" ||
+            getStatus(isCorrectGuess, attemptsTaken) === "lose"
+          }
+        />
+        <button className="reset-button" onClick={() => restartGame()}>
+          Restart
+        </button>
+      </div>
       {renderResult()}
     </>
   );
