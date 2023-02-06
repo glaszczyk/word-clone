@@ -8,6 +8,7 @@ import { checkGuess } from "../../game-helpers";
 import { GuessInput } from "../GuessInput";
 import { GuessList } from "../GuessList";
 import { Banner } from "../Banner";
+import { ScreenKeyboard } from "../ScreenKeyboard";
 
 const getStatus = (isCorrectGuess, attemptsTaken) => {
   if (isCorrectGuess && attemptsTaken <= NUM_OF_GUESSES_ALLOWED) return "win";
@@ -18,6 +19,7 @@ const getStatus = (isCorrectGuess, attemptsTaken) => {
 
 function Game() {
   const defaultList = [];
+  const [guess, setGuess] = React.useState("");
   const [guessList, setGuessList] = React.useState(defaultList);
   const [isCorrectGuess, setIsCorrectGuess] = React.useState(false);
   const [attemptsTaken, setAttemptsTaken] = React.useState(0);
@@ -40,6 +42,20 @@ function Game() {
     setGuessList(defaultList);
     setIsCorrectGuess(false);
     setAttemptsTaken(0);
+  };
+
+  const handleChangeGuess = (event) => {
+    const value = event.target.value.toUpperCase();
+    setGuess(value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (guess.length < 5) {
+      return;
+    }
+    handleAddNextGuess(guess);
+    setGuess("");
   };
 
   const handleAddNextGuess = (nextWord) => {
@@ -78,7 +94,9 @@ function Game() {
       <GuessList guessList={completeGuessList} />
       <div className="input-reset-wrapper">
         <GuessInput
-          setGuessList={handleAddNextGuess}
+          guess={guess}
+          onChange={handleChangeGuess}
+          handleSubmit={handleSubmit}
           disabled={
             getStatus(isCorrectGuess, attemptsTaken) === "win" ||
             getStatus(isCorrectGuess, attemptsTaken) === "lose"
@@ -89,6 +107,7 @@ function Game() {
         </button>
       </div>
       {renderResult()}
+      <ScreenKeyboard />
     </>
   );
 }
