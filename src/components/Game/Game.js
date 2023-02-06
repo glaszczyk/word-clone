@@ -58,12 +58,26 @@ function Game() {
     setGuess("");
   };
 
+  const handleScreenKeyboardSubmit = () => {
+    if (guess.length < 5) {
+      return;
+    }
+    handleAddNextGuess(guess);
+    setGuess("");
+  };
+
   const handleAddNextGuess = (nextWord) => {
     const checkedGuess = checkGuess(nextWord, answer);
     setAttemptsTaken(attemptsTaken + 1);
     setGuessList([...guessList, checkedGuess]);
     const result = checkedGuess.every((letter) => letter.status === "correct");
     setIsCorrectGuess(result);
+  };
+
+  const handleOnClick = (key) => {
+    if (guess.length < 5) {
+      setGuess(guess + key);
+    }
   };
 
   const renderResult = () => {
@@ -107,7 +121,10 @@ function Game() {
         </button>
       </div>
       {renderResult()}
-      <ScreenKeyboard />
+      <ScreenKeyboard
+        onClick={handleOnClick}
+        onSubmit={handleScreenKeyboardSubmit}
+      />
     </>
   );
 }

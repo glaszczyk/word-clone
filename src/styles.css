@@ -231,6 +231,10 @@ h1 {
     background-color: #ccc;
     border-radius: 5px;
 }
+.enter-button {
+    aspect-ratio: 3/1;
+    height: 30px;
+}
 
 /*
   Modal styles
