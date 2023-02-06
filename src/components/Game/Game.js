@@ -13,33 +13,32 @@ import { ScreenKeyboard } from "../ScreenKeyboard";
 
 const keysParsed = KEYS.map((key) => ({ letter: key.toUpperCase() }));
 
+const getKeyWithBestStatus = (arr, keyToFind) => {
+  const filteredKeys = arr.filter((item) => item.letter === keyToFind.letter);
+  if (filteredKeys.length === 0) {
+    return keyToFind;
+  }
+  return filteredKeys.reduce((acc, current) => {
+    if (Object.keys(acc).length === 0) {
+      return current;
+    }
+    if (acc?.status === "incorrect" && current?.status === "misplaced") {
+      return current;
+    }
+    if (acc?.status === "misplaced" && current?.status === "correct") {
+      return current;
+    }
+    return acc;
+  }, {});
+};
+
 const keysWithStatus = (keys, pressedKeys) => {
   const flatterPressedKeys = pressedKeys.reduce(
     (acc, current) => [...acc, ...current],
     []
   );
-  console.log(flatterPressedKeys);
-  const findKey = (arr, key) => {
-    const filteredKeys = arr.filter((item) => item.letter === key.letter);
-    if (filteredKeys.length === 0) {
-      return key;
-    }
-    return filteredKeys.reduce((acc, current) => {
-      if (Object.keys(acc).length === 0) {
-        return current;
-      }
-      if (acc?.status === "incorrect" && current?.status === "misplaced") {
-        return current;
-      }
-      if (acc?.status === "misplaced" && current?.status === "correct") {
-        return current;
-      }
-      return acc;
-    }, {});
-  };
-
   return keys.map((key) => ({
-    ...findKey(flatterPressedKeys, key),
+    ...getKeyWithBestStatus(flatterPressedKeys, key),
   }));
 };
 
