@@ -7,30 +7,73 @@ import { checkGuess } from "../../game-helpers";
 
 import { GuessInput } from "../GuessInput";
 import { GuessList } from "../GuessList";
+import { Banner } from "../Banner";
 
 // Pick a random word on every pageload.
 const answer = sample(WORDS);
 // To make debugging easier, we'll log the solution in the console.
 console.info({ answer });
 
+const getStatus = (isCorrectGuess, attemptsTaken) => {
+  if (isCorrectGuess && attemptsTaken <= NUM_OF_GUESSES_ALLOWED) return "win";
+  if (!isCorrectGuess && attemptsTaken === NUM_OF_GUESSES_ALLOWED)
+    return "lose";
+  return "in-progress";
+};
+
 function Game() {
   const [guessList, setGuessList] = React.useState([]);
-  const attemptsToTake = NUM_OF_GUESSES_ALLOWED - guessList.length;
+  const [isCorrectGuess, setIsCorrectGuess] = React.useState(false);
+  const [attemptsTaken, setAttemptsTaken] = React.useState(0);
+
   const remainingEmptyRows =
-    attemptsToTake > 0 ? range(0, attemptsToTake).map(() => null) : [];
+    attemptsTaken === NUM_OF_GUESSES_ALLOWED
+      ? []
+      : range(0, NUM_OF_GUESSES_ALLOWED - attemptsTaken).map(() => null);
   const completeGuessList = [...guessList, ...remainingEmptyRows];
 
   const handleAddNextGuess = (nextWord) => {
     const checkedGuess = checkGuess(nextWord, answer);
+    setAttemptsTaken(attemptsTaken + 1);
     setGuessList([...guessList, checkedGuess]);
+    const result = checkedGuess.every((letter) => letter.status === "correct");
+    setIsCorrectGuess(result);
   };
+
+  const renderResult = () => {
+    const status = getStatus(isCorrectGuess, attemptsTaken);
+    if (status === "win") {
+      return (
+        <Banner status="happy">
+          <p>
+            <strong>Congratulations!</strong> Got it in{" "}
+            <strong>{attemptsTaken} guesses</strong>.
+          </p>
+        </Banner>
+      );
+    }
+    if (status === "lose") {
+      return (
+        <Banner status="sad">
+          <p>
+            Sorry, the correct answer is <strong>{answer}</strong>.
+          </p>
+        </Banner>
+      );
+    }
+  };
+
   return (
     <>
       <GuessList guessList={completeGuessList} />
       <GuessInput
         setGuessList={handleAddNextGuess}
-        disabled={attemptsToTake === 0}
+        disabled={
+          getStatus(isCorrectGuess, attemptsTaken) === "win" ||
+          getStatus(isCorrectGuess, attemptsTaken) === "lose"
+        }
       />
+      {renderResult()}
     </>
   );
 }
