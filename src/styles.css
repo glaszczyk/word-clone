@@ -212,6 +212,26 @@ h1 {
     color: #fff;
 }
 
+.keyboard-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.row-wrapper {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.keyboard-button {
+    align-items: center;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    min-width: 30px;
+    background-color: #ccc;
+    border-radius: 5px;
+}
+
 /*
   Modal styles
 
